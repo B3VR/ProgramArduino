@@ -24,7 +24,7 @@ int csPin = 4;
 String fileName = "EKG";
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   pinMode(l0MPin, INPUT);
   pinMode(l0PPin, INPUT);
   pinMode(buttonPin, INPUT_PULLUP);
@@ -85,12 +85,21 @@ bool beginMeasurement() {
   }
     
   unsigned long measurmentTime = millis() - measurmentStartTime;
+  signalFile.close();
 
-  delay(1);
+  signalFile = SD.open(fullFileName, FILE_WRITE);
+  signalFile = SD.open(fullFileName, FILE_WRITE);
+
   String header = createHeader(measurmentTime, fullFileName);
   signalFile.println(header);
+
   signalFile.close();
+
   wasElectrodeDisconnected = false;
+
+  signalSavedMessage();
+  delay(1000);
+  startMessage();
   return true;
 }
 
@@ -113,23 +122,8 @@ void saveSample()  {
 
   bool newIsElectrodeDisconnected = isElectrodeDisconnected;
 
-  //checkElectrodeMessage(oldIsElectrodeDisconnected, newIsElectrodeDisconnected);
+  checkElectrodeMessage(oldIsElectrodeDisconnected, newIsElectrodeDisconnected);
   checkButtonPush();
-}
-
-void checkElectrodeMessage(bool oldIsElectrodeDisconnected, bool newIsElectrodeDisconnected){
-
-  if (oldIsElectrodeDisconnected != newIsElectrodeDisconnected)
-  {
-    if (newIsElectrodeDisconnected == true)
-    {
-      disconnectedElectrodeMessage();
-
-    }else if (newIsElectrodeDisconnected == false)
-    {
-      measurmentInProgressMessage();
-    }
-  }
 }
 
 // Pomocnicze
@@ -159,6 +153,21 @@ String getNextFileName(){
       return fullFileName;
     }
   } 
+}
+
+void checkElectrodeMessage(bool oldIsElectrodeDisconnected, bool newIsElectrodeDisconnected){
+
+  if (oldIsElectrodeDisconnected != newIsElectrodeDisconnected)
+  {
+    if (newIsElectrodeDisconnected == true)
+    {
+      disconnectedElectrodeMessage();
+
+    }else if (newIsElectrodeDisconnected == false)
+    {
+      measurmentInProgressMessage();
+    }
+  }
 }
 
 // Komunikaty wyświetlacza
@@ -193,4 +202,10 @@ void SDissueMessage() {
   lcd.print("Blad karty");
   lcd.setCursor(0,1);
   lcd.print("pamieci !");
+}
+
+void signalSavedMessage() {
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Zapisano badanie");
 }
