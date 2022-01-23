@@ -17,6 +17,7 @@ int signalPin = A5;
 const int rs = 8, en = 7, d4 = 2, d5 = 3, d6 = 5, d7 = 6;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 // SD card
+//SdFat SD;
 File signalFile;
 int csPin = 4;
 
