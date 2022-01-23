@@ -29,7 +29,7 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(signalPin, INPUT);
   
-  Timer1.initialize(5000);
+  Timer1.initialize(4300);
   Timer1.attachInterrupt(saveSample);
   noInterrupts();
 
@@ -79,12 +79,10 @@ bool beginMeasurement() {
   String fullFileName = getNextFileName();  
 
   signalFile = SD.open(fullFileName, FILE_WRITE);
-  signalFile = SD.open(fullFileName, FILE_WRITE);
   
   unsigned long measurmentStartTime = millis();
 
-  while (isMeasurmetInProgress)
-  {
+  while (isMeasurmetInProgress){
     interrupts();
   }
   noInterrupts();
@@ -93,8 +91,7 @@ bool beginMeasurement() {
   signalFile.close();
 
   signalFile = SD.open(fullFileName, FILE_WRITE);
-  signalFile = SD.open(fullFileName, FILE_WRITE);
-
+  
   String header = createHeader(measurmentTime, fullFileName);
   signalFile.println(header);
 
@@ -103,7 +100,7 @@ bool beginMeasurement() {
   wasElectrodeDisconnected = false;
 
   signalSavedMessage();
-  delay(1000);
+  delay(100000);
   startMessage();
   return true;
 }
@@ -120,7 +117,7 @@ void saveSample()  {
 
   }else {
     isElectrodeDisconnected = false;
-    float sample = analogRead(signalPin);
+    unsigned int sample = analogRead(signalPin);
     Serial.println(sample);   
     signalFile.println(sample);
   }
@@ -140,7 +137,7 @@ String createHeader(long measurmentTime, String fileName){
 
   if (wasElectrodeDisconnected)
   {
-    header = header + " (Podczas badania odpięto elektrodę ! Sygnał może być niepełny)";
+    header = header + " (Podczas badania odpięto elektrodę! Sygnał może być niepełny)";
   }
 
   return header;
