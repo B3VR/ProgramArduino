@@ -56,7 +56,7 @@ void checkButtonPush() {
     if (isMeasurmetInProgress == false)
     {
       isMeasurmetInProgress = true;
-      measurmentInProgressMessage();
+      SDissueMessage();
       beginMeasurement();
 
     }else if (isMeasurmetInProgress == true)
@@ -76,6 +76,7 @@ bool beginMeasurement() {
     return false;
   }
 
+  measurmentInProgressMessage();
   String fullFileName = getNextFileName();  
 
   signalFile = SD.open(fullFileName, FILE_WRITE);
@@ -98,7 +99,7 @@ bool beginMeasurement() {
   signalFile.close();
 
   wasElectrodeDisconnected = false;
-
+  isElectrodeDisconnected = false;
   signalSavedMessage();
   delay(100000);
   startMessage();
