@@ -1,7 +1,7 @@
 #include <LiquidCrystal.h>
 #include <SPI.h>
 #include <SD.h>
-//#include "SdFat.h"
+#include <TimerOne.h>
 
 bool isMeasurmetInProgress = false;
 int buttonPin = A1;
@@ -30,6 +30,10 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(signalPin, INPUT);
   
+  Timer1.initialize(4300);
+  Timer1.attachInterrupt(saveSample);
+  noInterrupts();
+
   while (!Serial) {
     
   }
@@ -76,20 +80,19 @@ bool beginMeasurement() {
   String fullFileName = getNextFileName();  
 
   signalFile = SD.open(fullFileName, FILE_WRITE);
-  signalFile = SD.open(fullFileName, FILE_WRITE);
   
   unsigned long measurmentStartTime = millis();
-  
+
   while (isMeasurmetInProgress){
-    saveSample();
+    interrupts();
   }
-    
+  noInterrupts();
+
   unsigned long measurmentTime = millis() - measurmentStartTime;
   signalFile.close();
 
   signalFile = SD.open(fullFileName, FILE_WRITE);
-  signalFile = SD.open(fullFileName, FILE_WRITE);
-
+  
   String header = createHeader(measurmentTime, fullFileName);
   signalFile.println(header);
 
@@ -98,7 +101,7 @@ bool beginMeasurement() {
   wasElectrodeDisconnected = false;
 
   signalSavedMessage();
-  delay(1000);
+  delay(100000);
   startMessage();
   return true;
 }
@@ -135,7 +138,7 @@ String createHeader(long measurmentTime, String fileName){
 
   if (wasElectrodeDisconnected)
   {
-    header = header + " (Podczas badania odpięto elektrodę ! Sygnał może być niepełny)";
+    header = header + " (Podczas badania odpięto elektrodę! Sygnał może być niepełny)";
   }
 
   return header;
