@@ -1,6 +1,7 @@
 #include <LiquidCrystal.h>
 #include <SPI.h>
 #include <SD.h>
+#include <TimerOne.h>
 
 bool isMeasurmetInProgress = false;
 int buttonPin = A1;
@@ -28,6 +29,10 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(signalPin, INPUT);
   
+  Timer1.initialize(5000);
+  Timer1.attachInterrupt(saveSample);
+  noInterrupts();
+
   while (!Serial) {
     
   }
@@ -77,11 +82,13 @@ bool beginMeasurement() {
   signalFile = SD.open(fullFileName, FILE_WRITE);
   
   unsigned long measurmentStartTime = millis();
-  
-  while (isMeasurmetInProgress){
-    saveSample();
+
+  while (isMeasurmetInProgress)
+  {
+    interrupts();
   }
-    
+  noInterrupts();
+
   unsigned long measurmentTime = millis() - measurmentStartTime;
   signalFile.close();
 
