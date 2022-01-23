@@ -115,7 +115,7 @@ void saveSample()  {
 
   }else {
     isElectrodeDisconnected = false;
-    float sample = analogRead(signalPin);
+    unsigned int sample = analogRead(signalPin);
     Serial.println(sample);   
     signalFile.println(sample);
   }
